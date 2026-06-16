@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: yourusername/frontend:v1 # Replace with your Docker Hub username
+        ports:
+        - containerPort: 3000
+        env:
+        - name: BACKEND_SERVICE_URL
+          value: "http://YOUR_EC2_PUBLIC_IP:30005" # <--- REPLACE WITH YOUR EC2 PUBLIC IP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 30001 # Accessible via EC2 Public IP:30001
+  type: NodePort
